@@ -45,11 +45,11 @@ with BeforeAndAfterAll
 }
 // creating a companion object
 object TestBankSpec{
-  case class deposit(amount: Int)
+  case class Deposit(amount: Int)
 
-  case class withdraw(amount: Int)
+  case class Withdraw(amount: Int)
 
-  case object getBalance
+  case object GetBalance
 
   case class Successful(message: String)
 
@@ -60,7 +60,7 @@ object TestBankSpec{
     var balance = 0 // var type because we have to update it so it should be mutable
 
     override def receive: Receive = {
-      case deposit(amount) => {
+      case Deposit(amount) => {
         // let's build some different scenarios
         //1. if the amount is negative so, no amount will be deposited
         if (amount < 0) {
@@ -71,7 +71,7 @@ object TestBankSpec{
         }
       }
       // case for the amount withdrawl
-      case withdraw(amount) => {
+      case Withdraw(amount) => {
         if (amount > balance) {
           sender() ! Denied("Insufficient balance")
         } else {
@@ -80,7 +80,7 @@ object TestBankSpec{
         }
       }
       // case to fetch the current balance
-      case getBalance => sender ! (s"Current Balance:=> $balance")
+      case GetBalance => sender ! (s"Current Balance:=> $balance")
       case Status=> context.self ! s"Your bank balance is: $balance"
     }
   }
@@ -94,10 +94,10 @@ object TestBankSpec{
     var updation=0
     override def receive: Receive = {
       case calculate1(ref) => {
-        ref ! deposit(1001)
+        ref ! Deposit(1001)
       }
       case calculate2(ref) => {
-        ref ! withdraw(100)
+        ref ! Withdraw(100)
       }
       case message => println(message)
     }
