@@ -5,15 +5,15 @@ import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 object BankSystem extends App{
 val system=ActorSystem("BankSystem")
 
-  case class deposit(amount:Int)
-  case class withdraw(amount:Int)
-  case object getBalance
+  case class Deposit(amount:Int)
+  case class Withdraw(amount:Int)
+  case object GetBalance
   case class Successful(message:String)
   case class Denied(message:String)
   class Bank extends Actor{
     var balance=0     // var type because we have to update it so it should be mutable
     override def receive: Receive ={
-      case deposit(amount)=>{
+      case Deposit(amount)=>{
         // let's build some different scenarios
         //1. if the bank has negative balance so, no amount will be deposited
         if(amount<0){
@@ -24,7 +24,7 @@ val system=ActorSystem("BankSystem")
         }
       }
       // case for the amount withdrawl
-      case withdraw(amount)=>{
+      case Withdraw(amount)=>{
         if (amount>balance) {
           sender() ! Denied("Insufficient balance")
         } else {
@@ -33,7 +33,7 @@ val system=ActorSystem("BankSystem")
         }
       }
       // case to fetch the current balance
-      case getBalance=> sender ! (s"Current Balance:=> $balance")
+      case GetBalance=> sender ! (s"Current Balance:=> $balance")
     }
   }
 
@@ -44,15 +44,15 @@ val system=ActorSystem("BankSystem")
     override def receive: Receive = {
       case calculate(ref)=>{
         // Lets give a positive input
-        ref ! deposit(10000)
+        ref ! Deposit(10000)
         // lets check the balance
-        ref ! getBalance
+        ref ! GetBalance
         // lets give a negative input
-        ref ! withdraw(90000)   // withdraw is not even possible
+        ref ! Withdraw(90000)   // withdraw is not even possible
         // lets give a positive input
-        ref ! withdraw(800)    // withdraw is possible
+        ref ! Withdraw(800)    // withdraw is possible
         // lets check the new balance
-        ref ! getBalance
+        ref ! GetBalance
       }
       case message=> println(message)
     }
